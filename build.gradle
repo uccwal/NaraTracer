@@ -17,7 +17,13 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.jsoup:jsoup:1.14.3'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.json:json:20210307' // 최신 버전 확인 필요
+    implementation 'org.mongodb:mongodb-driver-sync'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
 }
 
 tasks.named('bootBuildImage') {
