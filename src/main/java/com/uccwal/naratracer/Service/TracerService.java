@@ -15,7 +15,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +49,7 @@ public class TracerService {
 
 
             // 페이지 1부터 5까지 반복
-            for (int pageNo = 1; pageNo <= 5; pageNo++) {
+            for (int pageNo = 1; pageNo <= 25; pageNo++) {
                 // 현재 페이지의 URL 생성
                 String url = baseUrl + pageNo;
 
@@ -163,7 +165,6 @@ public class TracerService {
 
 
 
-    // 날짜 및 시간 데이터를 가져오는 함수
         private static JSONObject getDateTimeData(Elements dateTimeElements) {
             JSONObject dateTimeData = new JSONObject();
             if (!dateTimeElements.isEmpty()) {
@@ -171,15 +172,28 @@ public class TracerService {
                 String[] dateTimeParts = cleanedHtml.split("<br>");
 
                 if (dateTimeParts.length == 2) {
-                    dateTimeData.put("bidStart", dateTimeParts[0].trim());
+                    dateTimeData.put("bidStart", convertToStandardDateTime(dateTimeParts[0].trim()));
 
                     // "bidStart" 값을 정리
                     String bidStartRaw = dateTimeParts[1].trim();
                     String cleanedBidStart = bidStartRaw.replaceAll("<span>", "").replaceAll("</span>", "").replaceAll("\\(", "").replaceAll("\\)", "");
-                    dateTimeData.put("bidEnd", cleanedBidStart);
+                    dateTimeData.put("bidEnd", convertToStandardDateTime(cleanedBidStart));
                 }
             }
             return dateTimeData;
+        }
+
+        private static String convertToStandardDateTime(String rawDateTime) {
+            try {
+                DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
+                LocalDateTime parsedDateTime = LocalDateTime.parse(rawDateTime, inputFormatter);
+
+                DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                return parsedDateTime.format(outputFormatter);
+            } catch (DateTimeParseException e) {
+                //logger.error("Error parsing date time: " + rawDateTime);
+                return "-"; // 또는 다른 기본값을 반환하거나 예외를 처리할 수 있습니다.
+            }
         }
 
         // 버튼 데이터를 가져오는 함수
